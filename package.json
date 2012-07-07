@@ -1,0 +1,22 @@
+{
+	"name": "twitterfeed",
+	"version": "0.0.1",
+	"author": "Tim Savery <tim.savery@gmail.com>",
+	"description": "Simple abstraction on top of ntwitter for working with a website feed.",
+	"main": "twitterfeed.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/timsavery/twitterfeed.git"
+	},
+	"keywords": [
+		"twitter",
+		"feed"
+	],
+	"dependencies": {
+		"ntwitter": "0.4.0"
+	},
+	"license": "MIT",
+	"engines": {
+		"node": ">=0.4.0"
+	}
+}
