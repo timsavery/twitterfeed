@@ -1,5 +1,5 @@
 ```javascript
-feed = new (require('twitterfeed'))({
+var feed = new (require('twitterfeed'))({
   searchString: '@NodePhilly OR #nodephilly OR #nodejs', // https://dev.twitter.com/docs/using-search
   filterString: 'nodephilly,nodejs', // https://dev.twitter.com/docs/streaming-apis/parameters#track
   cacheLimit: 3
