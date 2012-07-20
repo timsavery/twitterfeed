@@ -51,12 +51,7 @@ module.exports = function(options) {
 				}
 
 				tweets.results.forEach(function(tweet) {
-					if (cache.length > cacheLimit) {
-						cache.push(tweet);
-						cache = cache.splice(0, cacheLimit);						
-					} else {
-						cache.push(tweet);						
-					}
+					addTweetToCache(tweet);
 				});				
 
 				callback(null, tweets);
@@ -68,28 +63,39 @@ module.exports = function(options) {
 
 		twitter.stream('statuses/filter', { track: filterString }, function(stream) {
 			stream.on('data', function(tweet) {
+				addTweetToCache(tweet);
+
 				tweetHandler(tweet);
 			});
 
 			stream.on('error', function(error) {
-				throw new Error('Twitter stream errored: ' + JSON.stringify(error));
+				throw new Error('Twitter stream errored: ' + error);
 			});
 
 			stream.on('end', function(response) {
-				throw new Error('Twitter stream disconnected: ' + JSON.stringify(response));
+				throw new Error('Twitter stream disconnected: ' + response);
 			});
 
 			stream.on('destroy', function(response) {
-				throw new Error('Twitter stream destroyed: ' + JSON.stringify(response));
+				throw new Error('Twitter stream destroyed: ' + response);
 			});
 
 			tweetStream = stream;
 
-			if (callback) callback();
+			callback();
 		});
 	};
 
 	this.getCachedTweets = function() {
 		return cache;
+	};
+
+	var addTweetToCache = function(tweet) {
+		if (cache.length > cacheLimit) {
+			cache.push(tweet);
+			cache = cache.splice(0, cacheLimit);						
+		} else {
+			cache.push(tweet);						
+		}
 	};
 };
