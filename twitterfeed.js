@@ -1,4 +1,7 @@
-module.exports = function(options) {
+var events = require('events')
+  , util = require('util');
+
+function TwitterFeed(options) {
 	if (!options) { options = {}; }
 
 	var consumer_key = options.consumer_key || process.env.TWITTER_CONSUMER_KEY
@@ -41,49 +44,42 @@ module.exports = function(options) {
   	access_token_secret: access_token_secret
   });
 
-  var tweetStream = null
-    , tweetHandler = null;
+	this.start = function(callback) {
+		var self = this;
 
-	this.init = function(callback) {
 		twitter.search(searchString, {}, function(err, tweets) {
-				if (err) {
-					return callback(err);
-				}
+			if (err) {
+				self.emit('error', err);
+			}
 
-				tweets.results.forEach(function(tweet) {
-					addTweetToCache(tweet);
-				});				
-
-				callback(null, tweets);
-		});
-	};
-
-	this.stream = function(tweetHandler, callback) {
-		tweetHandler = tweetHandler || function() {};
-
-		twitter.stream('statuses/filter', { track: filterString }, function(stream) {
-			stream.on('data', function(tweet) {
+			tweets.results.forEach(function(tweet) {
 				addTweetToCache(tweet);
 
-				tweetHandler(tweet);
+				self.emit('tweet', tweet);
+			});				
+
+			twitter.stream('statuses/filter', { track: filterString }, function(stream) {
+				stream.on('data', function(tweet) {
+					addTweetToCache(tweet);
+
+					self.emit('tweet', tweet);
+				});
+
+				stream.on('error', function(error, statusCode) {
+					self.emit('error', error, statusCode);
+				});
+
+				stream.on('end', function(response) {
+					self.emit('end', response);
+				});
+
+				stream.on('destroy', function(response) {
+					self.emit('destroy', response);
+				});
 			});
-
-			stream.on('error', function(error) {
-				throw new Error('Twitter stream errored: ' + error);
-			});
-
-			stream.on('end', function(response) {
-				throw new Error('Twitter stream disconnected: ' + response);
-			});
-
-			stream.on('destroy', function(response) {
-				throw new Error('Twitter stream destroyed: ' + response);
-			});
-
-			tweetStream = stream;
-
-			callback();
 		});
+
+		return self;
 	};
 
 	this.getCachedTweets = function() {
@@ -99,3 +95,7 @@ module.exports = function(options) {
 		}
 	};
 };
+
+util.inherits(TwitterFeed, events.EventEmitter);
+
+module.exports = TwitterFeed;
