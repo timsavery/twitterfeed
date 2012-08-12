@@ -1,6 +1,6 @@
 {
 	"name": "twitterfeed",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"author": "Tim Savery <tim.savery@gmail.com>",
 	"description": "Simple abstraction on top of ntwitter for working with a website feed.",
 	"main": "twitterfeed.js",
