@@ -75,8 +75,8 @@ function TwitterFeed(options) {
 					stream.on('destroy', function(response) {
 						self.emit('destroy', response);
 					});
-				}
-			});
+				});
+			}
 		});
 
 		return self;
