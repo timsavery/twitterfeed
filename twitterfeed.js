@@ -50,32 +50,32 @@ function TwitterFeed(options) {
 		twitter.search(searchString, {}, function(err, tweets) {
 			if (err) {
 				self.emit('error', err);
-			}
-
-			tweets.results.forEach(function(tweet) {
-				addTweetToCache(tweet);
-
-				self.emit('tweet', tweet);
-			});				
-
-			twitter.stream('statuses/filter', { track: filterString }, function(stream) {
-				stream.on('data', function(tweet) {
+			} else {		
+				tweets.results.forEach(function(tweet) {
 					addTweetToCache(tweet);
 
 					self.emit('tweet', tweet);
-				});
+				});				
 
-				stream.on('error', function(error, statusCode) {
-					self.emit('error', error, statusCode);
-				});
+				twitter.stream('statuses/filter', { track: filterString }, function(stream) {
+					stream.on('data', function(tweet) {
+						addTweetToCache(tweet);
 
-				stream.on('end', function(response) {
-					self.emit('end', response);
-				});
+						self.emit('tweet', tweet);
+					});
 
-				stream.on('destroy', function(response) {
-					self.emit('destroy', response);
-				});
+					stream.on('error', function(error, statusCode) {
+						self.emit('error', error, statusCode);
+					});
+
+					stream.on('end', function(response) {
+						self.emit('end', response);
+					});
+
+					stream.on('destroy', function(response) {
+						self.emit('destroy', response);
+					});
+				}
 			});
 		});
 
